@@ -8,6 +8,10 @@ class AttendanceModel extends Attendance {
     required super.checkIn,
     super.checkOut,
     required super.date,
+    super.checkInLat,
+    super.checkInLng,
+    super.checkOutLat,
+    super.checkOutLng,
   });
 
   factory AttendanceModel.fromMap(Map<String, dynamic> map, String id) {
@@ -17,6 +21,10 @@ class AttendanceModel extends Attendance {
       checkIn: (map['checkIn'] as Timestamp).toDate(),
       checkOut: map['checkOut'] != null ? (map['checkOut'] as Timestamp).toDate() : null,
       date: (map['date'] as Timestamp).toDate(),
+      checkInLat: map['checkInLat'],
+      checkInLng: map['checkInLng'],
+      checkOutLat: map['checkOutLat'],
+      checkOutLng: map['checkOutLng'],
     );
   }
 
@@ -26,6 +34,10 @@ class AttendanceModel extends Attendance {
       'checkIn': Timestamp.fromDate(checkIn),
       'checkOut': checkOut != null ? Timestamp.fromDate(checkOut!) : null,
       'date': Timestamp.fromDate(date),
+      'checkInLat': checkInLat,
+      'checkInLng': checkInLng,
+      'checkOutLat': checkOutLat,
+      'checkOutLng': checkOutLng,
     };
   }
 }

@@ -8,12 +8,13 @@
 
 ### For employees
 - **Register / log in** and link to your employer using their **employer code**
-- **Check in** and **check out** with one tap
-- **View your attendance history** (dates, check-in/out times, status)
+- **Check in** and **check out** with one tap (location-verified for security)
+- **View your attendance history** (dates, check-in/out times, status, locations)
 
 ### For employers
 - **Register / log in** and get a unique **employer code** to share with your team
-- **See all linked employees** — tap any employee to view their full attendance history (dates, check-in/out times, status)
+- **Set office location & radius** for location-based check-ins (Settings screen)
+- **See all linked employees** — tap any employee to view their full attendance history (dates, check-in/out times, status, locations)
 
 Data is scoped by employer: each employer only sees their own employees and attendance.
 
@@ -77,6 +78,7 @@ In [Firebase Console](https://console.firebase.google.com) for your project:
 3. **Firestore → Rules** — use rules that:
    - Let users read/write their own `users` doc and let employers read `users` docs where `employerId == request.auth.uid`.
    - Let authenticated users read/write `attendance` (restrict further if needed).
+   - **Geofencing**: Employers can set office location in `companies/{employerId}` doc.
 
    Example:
 

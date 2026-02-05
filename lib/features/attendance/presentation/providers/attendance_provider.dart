@@ -8,7 +8,7 @@ final attendanceRepositoryProvider = Provider<AttendanceRepositoryInterface>((re
   return AttendanceRepositoryImpl(ref.read(firestoreProvider));
 });
 
-final todayAttendanceProvider = StreamProvider.family<Attendance?, String>((ref, userId) {
+final todayAttendanceProvider = StreamProvider.family<List<Attendance>, String>((ref, userId) {
   return ref.watch(attendanceRepositoryProvider).getTodayAttendance(userId);
 });
 

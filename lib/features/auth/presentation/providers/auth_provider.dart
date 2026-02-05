@@ -20,6 +20,12 @@ final employeesProvider = FutureProvider.family<List<AppUser>, String>((ref, emp
   return ref.watch(authRepositoryProvider).getEmployees(employerId);
 });
 
+/// Company settings (office location, radius) for geofencing
+final companySettingsProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, employerId) async {
+  final doc = await ref.read(firestoreProvider).collection('companies').doc(employerId).get();
+  return doc.data() ?? {};
+});
+
 class AuthController extends Notifier<AsyncValue<void>> {
   @override
   AsyncValue<void> build() => const AsyncValue.data(null);

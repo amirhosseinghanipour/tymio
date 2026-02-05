@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:solar_icons/solar_icons.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -61,8 +60,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Icon(SolarIconsBold.stopwatch, size: 64, color: AppColors.primary),
-                    const SizedBox(height: 16),
                     Text(
                       'Welcome to Tymio',
                       textAlign: TextAlign.center,
@@ -85,7 +82,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       validator: Validators.email,
-                      prefixIcon: const Icon(SolarIconsOutline.letter),
                     ),
                     const SizedBox(height: 16),
                     CustomTextField(
@@ -93,7 +89,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       controller: _passwordController,
                       isPassword: true,
                       validator: (val) => Validators.required(val),
-                      prefixIcon: const Icon(SolarIconsOutline.lockPassword),
                     ),
                     const SizedBox(height: 32),
                     CustomButton(

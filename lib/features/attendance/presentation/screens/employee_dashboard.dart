@@ -69,90 +69,129 @@ class EmployeeDashboard extends ConsumerWidget {
             ),
             const SizedBox(height: 40),
             
-            // Check In/Out Section
+            // Check In/Out Section (multiple sessions per day)
             Expanded(
               child: todayAttendanceAsync.when(
-                data: (attendance) {
-                  final isCheckedIn = attendance != null && attendance.checkOut == null;
-                  final isCheckedOut = attendance != null && attendance.checkOut != null;
-                  
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        DateFormat('EEEE, d MMMM').format(DateTime.now()),
-                        style: const TextStyle(color: Colors.grey, fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        DateFormat('hh:mm a').format(DateTime.now()),
-                        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 40),
-                      
-                      GestureDetector(
-                        onTap: () {
-                          if (isCheckedOut) return; // Already done for today
-                          final controller = ref.read(attendanceControllerProvider.notifier);
-                          if (isCheckedIn) {
-                            controller.checkOut(attendance.id);
-                          } else {
-                            controller.checkIn(user.id);
-                          }
-                        },
-                        child: Container(
-                          width: 200,
-                          height: 200,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isCheckedOut 
-                                ? Colors.grey 
-                                : (isCheckedIn ? AppColors.error : AppColors.success),
-                            boxShadow: [
-                              BoxShadow(
-                                color: (isCheckedOut 
-                                    ? Colors.grey 
-                                    : (isCheckedIn ? AppColors.error : AppColors.success)).withValues(alpha: 0.3),
-                                blurRadius: 20,
-                                spreadRadius: 5,
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                isCheckedOut 
-                                    ? SolarIconsBold.checkCircle 
-                                    : (isCheckedIn ? SolarIconsBold.exit : SolarIconsBold.login),
-                                size: 48,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                isCheckedOut 
-                                    ? 'Completed' 
-                                    : (isCheckedIn ? 'Check Out' : 'Check In'),
-                                style: const TextStyle(
+                data: (todayRecords) {
+                  // Open session = most recent record with no check-out (list sorted by checkIn asc)
+                  final openSessions =
+                      todayRecords.where((a) => a.checkOut == null).toList();
+                  final openSession =
+                      openSessions.isEmpty ? null : openSessions.last;
+                  final hasOpenSession = openSession != null;
+
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          DateFormat('EEEE, d MMMM').format(DateTime.now()),
+                          style: const TextStyle(
+                              color: Colors.grey, fontSize: 16),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          DateFormat('hh:mm a').format(DateTime.now()),
+                          style: const TextStyle(
+                              fontSize: 32, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 40),
+                        GestureDetector(
+                          onTap: () {
+                            final controller = ref
+                                .read(attendanceControllerProvider.notifier);
+                            if (hasOpenSession) {
+                              controller.checkOut(openSession.id);
+                            } else {
+                              controller.checkIn(user.id);
+                            }
+                          },
+                          child: Container(
+                            width: 200,
+                            height: 200,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: hasOpenSession
+                                  ? AppColors.error
+                                  : AppColors.success,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: (hasOpenSession
+                                          ? AppColors.error
+                                          : AppColors.success)
+                                      .withValues(alpha: 0.3),
+                                  blurRadius: 20,
+                                  spreadRadius: 5,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  hasOpenSession
+                                      ? SolarIconsBold.exit
+                                      : SolarIconsBold.login,
+                                  size: 48,
                                   color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  hasOpenSession
+                                      ? 'Check Out'
+                                      : 'Check In',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        if (hasOpenSession)
+                          Text(
+                            'Checked in at ${DateFormat('hh:mm a').format(openSession.checkIn)}',
+                            style: const TextStyle(
+                                color: AppColors.success,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        if (todayRecords.isNotEmpty) ...[
+                          const SizedBox(height: 32),
+                          Text(
+                            "Today's sessions",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(
+                                    color: AppColors.textSecondary,
+                                    fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          ...todayRecords.map((a) {
+                            final out = a.checkOut != null
+                                ? DateFormat('hh:mm a').format(a.checkOut!)
+                                : 'now';
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Text(
+                                '${DateFormat('hh:mm a').format(a.checkIn)} – $out',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      if (isCheckedIn)
-                        Text(
-                          'Checked in at ${DateFormat('hh:mm a').format(attendance.checkIn)}',
-                          style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.w500),
-                        ),
-                    ],
+                            );
+                          }),
+                        ],
+                      ],
+                    ),
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
                 error: (err, stack) => Center(child: Text('Error: $err')),
               ),
             ),

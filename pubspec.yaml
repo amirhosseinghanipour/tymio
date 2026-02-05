@@ -42,6 +42,7 @@ dependencies:
   uuid: ^4.5.2
   intl: ^0.20.2
   google_fonts: ^8.0.1
+  geolocator: ^14.0.2
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +54,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -95,3 +97,21 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# App icon configuration (generated from assets/logo/app_icon.png)
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo/app_icon.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/logo/app_icon.png"
+    background_color: "#1a1a2e"
+    theme_color: "#1a1a2e"
+  windows:
+    generate: true
+    image_path: "assets/logo/app_icon.png"
+  macos:
+    generate: true
+    image_path: "assets/logo/app_icon.png"

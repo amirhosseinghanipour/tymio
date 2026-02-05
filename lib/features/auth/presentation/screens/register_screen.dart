@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:solar_icons/solar_icons.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/utils/validators.dart';
@@ -53,10 +54,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(SolarIconsOutline.arrowLeft, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -73,16 +70,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Join Tymio to manage attendance',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 32),
                 CustomTextField(
                   label: 'Full Name',
                   controller: _nameController,
                   validator: Validators.required,
-                  prefixIcon: const Icon(SolarIconsOutline.user),
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
@@ -90,7 +86,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: Validators.email,
-                  prefixIcon: const Icon(SolarIconsOutline.letter),
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
@@ -98,51 +93,122 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   controller: _passwordController,
                   isPassword: true,
                   validator: (val) => Validators.minLength(val, 6),
-                  prefixIcon: const Icon(SolarIconsOutline.lockPassword),
                 ),
                 const SizedBox(height: 24),
                 
-                // Role Toggle
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(SolarIconsOutline.usersGroupTwoRounded),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              _isEmployer ? 'I am an Employer' : 'I am an Employee',
-                              style: const TextStyle(fontWeight: FontWeight.w600),
+                // Role Selection
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'I am a...',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        // Employee Option
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _isEmployer = false),
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: !_isEmployer ? AppColors.primary : AppColors.surface,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: !_isEmployer ? AppColors.accent : AppColors.textSecondary.withValues(alpha: 0.3),
+                                  width: !_isEmployer ? 2 : 1,
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    SolarIconsOutline.user,
+                                    size: 32,
+                                    color: !_isEmployer ? Colors.white : AppColors.primary,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Employee',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: !_isEmployer ? Colors.white : AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Track my attendance',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: !_isEmployer ? Colors.white.withValues(alpha: 0.8) : AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          Switch(
-                            value: _isEmployer,
-                            onChanged: (val) {
-                              setState(() {
-                                _isEmployer = val;
-                              });
-                            },
+                        ),
+                        const SizedBox(width: 16),
+                        // Employer Option
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _isEmployer = true),
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: _isEmployer ? AppColors.primary : AppColors.surface,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _isEmployer ? AppColors.accent : AppColors.textSecondary.withValues(alpha: 0.3),
+                                  width: _isEmployer ? 2 : 1,
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    SolarIconsOutline.home,
+                                    size: 32,
+                                    color: _isEmployer ? Colors.white : AppColors.primary,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Employer',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: _isEmployer ? Colors.white : AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Manage my team',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: _isEmployer ? Colors.white.withValues(alpha: 0.8) : AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ],
-                      ),
-                      if (!_isEmployer) ...[
-                        const Divider(height: 24),
-                        CustomTextField(
-                          label: 'Employer Code',
-                          controller: _employerIdController,
-                          hint: 'Enter your employer\'s ID',
-                          validator: _isEmployer ? null : Validators.required,
-                          prefixIcon: const Icon(SolarIconsOutline.key),
                         ),
                       ],
+                    ),
+                    if (!_isEmployer) ...[
+                      const SizedBox(height: 24),
+                      CustomTextField(
+                        label: 'Employer Code',
+                        controller: _employerIdController,
+                        hint: 'Enter your employer\'s ID',
+                        validator: _isEmployer ? null : Validators.required,
+                      ),
                     ],
-                  ),
+                  ],
                 ),
 
                 const SizedBox(height: 32),

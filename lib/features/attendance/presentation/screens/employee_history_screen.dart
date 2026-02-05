@@ -21,14 +21,14 @@ class EmployeeHistoryScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.textPrimary,
         leading: IconButton(
-          icon: const Icon(SolarIconsOutline.arrowLeft),
+          icon: const Icon(SolarIconsOutline.arrowLeft, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: historyAsync.when(
         data: (history) {
           if (history.isEmpty) {
-            return const Center(child: Text('No attendance records found'));
+            return Center(child: Text('No attendance records found', style: TextStyle(color: AppColors.textSecondary)));
           }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -45,9 +45,9 @@ class EmployeeHistoryScreen extends ConsumerWidget {
               return Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: AppColors.textSecondary.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,14 +57,18 @@ class EmployeeHistoryScreen extends ConsumerWidget {
                       children: [
                         Text(
                           dateStr,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
                             const Icon(SolarIconsOutline.login, size: 16, color: AppColors.success),
                             const SizedBox(width: 4),
-                            Text(checkInStr, style: const TextStyle(fontSize: 14)),
+                            Text(checkInStr, style: TextStyle(fontSize: 14, color: AppColors.textSecondary)),
                           ],
                         ),
                       ],
@@ -92,7 +96,7 @@ class EmployeeHistoryScreen extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Text(checkOutStr, style: const TextStyle(fontSize: 14)),
+                            Text(checkOutStr, style: TextStyle(fontSize: 14, color: AppColors.textSecondary)),
                             const SizedBox(width: 4),
                             const Icon(SolarIconsOutline.exit, size: 16, color: AppColors.error),
                           ],
@@ -106,7 +110,7 @@ class EmployeeHistoryScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => Center(child: Text('Error: $err', style: TextStyle(color: AppColors.error))),
       ),
     );
   }

@@ -6,6 +6,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../auth/domain/entities/app_user.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import 'employee_detail_screen.dart';
+import 'employer_settings_screen.dart';
 
 class EmployerDashboard extends ConsumerWidget {
   const EmployerDashboard({super.key});
@@ -23,6 +24,18 @@ class EmployerDashboard extends ConsumerWidget {
         foregroundColor: AppColors.textPrimary,
         actions: [
           IconButton(
+            icon: const Icon(SolarIconsOutline.settings),
+            tooltip: 'Settings',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const EmployerSettingsScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(SolarIconsOutline.logout),
             onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
           ),
@@ -37,19 +50,62 @@ class EmployerDashboard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, Color(0xFF8E86FF)],
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF2C2C2C), // Dark metallic base
+                    const Color(0xFF1A1A1A), // Darker metallic
+                    const Color(0xFF3A3A3A), // Medium metallic
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  // Outer glow effect
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 0),
+                  ),
+                  // Inner highlight
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    blurRadius: 0,
+                    spreadRadius: 0,
+                    offset: const Offset(-2, -2),
+                  ),
+                  // Inner shadow for depth
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 0,
+                    spreadRadius: 0,
+                    offset: const Offset(2, 2),
+                  ),
+                ],
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 1,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Your Employer Code',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          offset: const Offset(0, 1),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -58,38 +114,153 @@ class EmployerDashboard extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           user.id,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Monospace',
+                            shadows: [
+                              Shadow(
+                                color: AppColors.primary.withValues(alpha: 0.8),
+                                offset: const Offset(0, 0),
+                                blurRadius: 8,
+                              ),
+                              Shadow(
+                                color: Colors.white.withValues(alpha: 0.3),
+                                offset: const Offset(0, 0),
+                                blurRadius: 4,
+                              ),
+                            ],
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(SolarIconsBold.copy, color: Colors.white),
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: user.id));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Code copied to clipboard')),
-                          );
-                        },
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            SolarIconsBold.copy,
+                            color: Colors.white.withValues(alpha: 0.9),
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                offset: const Offset(0, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: user.id));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Code copied to clipboard'),
+                                backgroundColor: AppColors.surface,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Share this code with your employees to link them.',
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          offset: const Offset(0, 1),
+                          blurRadius: 1,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-            const Text(
+            const SizedBox(height: 20),
+            // Office location card — where employer sets the check-in area
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const EmployerSettingsScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      SolarIconsOutline.mapPoint,
+                      color: AppColors.accent,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Office location for check-in',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              color: Color(0xFF0A7A7B),
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Set where employees can check in/out',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      SolarIconsOutline.altArrowRight,
+                      color: AppColors.accent,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
               'Your Employees',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 16),
             
@@ -100,10 +271,17 @@ class EmployerDashboard extends ConsumerWidget {
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(SolarIconsOutline.usersGroupTwoRounded, size: 48, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text('No employees linked yet'),
+                        children: [
+                          Icon(
+                            SolarIconsOutline.usersGroupTwoRounded,
+                            size: 48,
+                            color: AppColors.textSecondary,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No employees linked yet',
+                            style: TextStyle(color: AppColors.textSecondary),
+                          ),
                         ],
                       ),
                     );
@@ -119,7 +297,12 @@ class EmployerDashboard extends ConsumerWidget {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Center(child: Text('Error: $err')),
+                error: (err, stack) => Center(
+                  child: Text(
+                    'Error: $err',
+                    style: TextStyle(color: AppColors.error),
+                  ),
+                ),
               ),
             ),
           ],
@@ -148,16 +331,9 @@ class _EmployeeCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: Border.all(color: AppColors.textSecondary.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -175,16 +351,26 @@ class _EmployeeCard extends StatelessWidget {
                 children: [
                   Text(
                     employee.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                   Text(
                     employee.email,
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(SolarIconsOutline.altArrowRight, color: Colors.grey),
+            Icon(
+              SolarIconsOutline.altArrowRight,
+              color: AppColors.textSecondary,
+            ),
           ],
         ),
       ),

@@ -25,7 +25,7 @@ class TymioApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Tymio',
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       home: const AuthWrapper(),
     );
