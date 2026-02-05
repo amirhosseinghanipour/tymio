@@ -102,35 +102,4 @@ class AttendanceRepositoryImpl implements AttendanceRepositoryInterface {
           .toList();
     });
   }
-
-  @override
-  Future<List<Attendance>> getEmployeesAttendanceInRange(
-    List<String> userIds,
-    DateTime start,
-    DateTime end,
-  ) async {
-    if (userIds.isEmpty) return [];
-    // Firestore whereIn limit is 10; chunk if needed
-    const chunkSize = 10;
-    final allResults = <Attendance>[];
-    for (var i = 0; i < userIds.length; i += chunkSize) {
-      final chunk = userIds
-          .skip(i)
-          .take(chunkSize)
-          .toList();
-      final snapshot = await _firestore
-          .collection('attendance')
-          .where('userId', whereIn: chunk)
-          .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(end))
-          .get();
-      for (final doc in snapshot.docs) {
-        allResults.add(
-          AttendanceModel.fromMap(doc.data(), doc.id) as Attendance,
-        );
-      }
-    }
-    allResults.sort((a, b) => b.date.compareTo(a.date));
-    return allResults;
-  }
 }

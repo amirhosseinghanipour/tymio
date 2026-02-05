@@ -6,7 +6,6 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../auth/domain/entities/app_user.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import 'employee_detail_screen.dart';
-import 'employer_analytics_screen.dart';
 
 class EmployerDashboard extends ConsumerWidget {
   const EmployerDashboard({super.key});
@@ -23,18 +22,6 @@ class EmployerDashboard extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.textPrimary,
         actions: [
-          IconButton(
-            icon: const Icon(SolarIconsOutline.chartSquare),
-            tooltip: 'Analytics',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const EmployerAnalyticsScreen(),
-                ),
-              );
-            },
-          ),
           IconButton(
             icon: const Icon(SolarIconsOutline.logout),
             onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
@@ -99,54 +86,7 @@ class EmployerDashboard extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            // Analytics shortcut
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const EmployerAnalyticsScreen(),
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      SolarIconsOutline.chartSquare,
-                      color: AppColors.accent,
-                      size: 24,
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        'View analytics',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                          color: Color(0xFF0A7A7B),
-                        ),
-                      ),
-                    ),
-                    const Icon(
-                      SolarIconsOutline.altArrowRight,
-                      color: Color(0xFF0A7A7B),
-                      size: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             const Text(
               'Your Employees',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

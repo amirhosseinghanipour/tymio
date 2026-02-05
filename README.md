@@ -1,6 +1,6 @@
 # Tymio
 
-**Tymio** is an attendance tracking app for teams. Employees check in and out; employers see who worked and for how long, with simple analytics by day, week, or month.
+**Tymio** is an attendance tracking app for teams. Employees check in and out; employers see their linked employees and tap any person to view that employee’s full attendance history.
 
 ---
 
@@ -13,8 +13,7 @@
 
 ### For employers
 - **Register / log in** and get a unique **employer code** to share with your team
-- **See all linked employees** and tap any employee to view their full attendance history
-- **Analytics**: who worked how much — **today**, **this week**, or **this month** (total hours and days worked per employee)
+- **See all linked employees** — tap any employee to view their full attendance history (dates, check-in/out times, status)
 
 Data is scoped by employer: each employer only sees their own employees and attendance.
 
