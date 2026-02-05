@@ -1,36 +1,39 @@
 # Tymio
 
-**Tymio** is an attendance tracking app for teams. Employees check in and out; employers see their linked employees and tap any person to view that employee’s full attendance history.
+**Tymio** is a mobile attendance app for teams. Employees check in and out (with optional location verification); employers set an office area and see their team’s attendance.
 
 ---
 
 ## Features
 
-### For employees
-- **Register / log in** and link to your employer using their **employer code**
-- **Check in** and **check out** with one tap (location-verified for security)
-- **View your attendance history** (dates, check-in/out times, status, locations)
+### Employees
+- **Register / log in** and link to an employer using their **employer code**
+- **Check in / check out** as often as needed per day (multiple sessions)
+- **Location** captured for each check-in/out when available; check-in can be restricted to the office area (geofencing)
+- **Today’s sessions** listed on the dashboard; **History** screen for full attendance
 
-### For employers
-- **Register / log in** and get a unique **employer code** to share with your team
-- **Set office location & radius** for location-based check-ins (Settings screen)
-- **See all linked employees** — tap any employee to view their full attendance history (dates, check-in/out times, status, locations)
+### Employers
+- **Register / log in** and get a unique **employer code** to share with employees
+- **Set office location** (dashboard card “Office location for check-in” or **Settings** → use current location, set radius 25–1000 m) so employees can only check in/out when within that area
+- **Employee list** — tap an employee to see their full attendance history (dates, times, status)
+- **Settings** (gear icon) for office location and radius
 
-Data is scoped by employer: each employer only sees their own employees and attendance.
+Data is scoped per employer: each employer only sees their own employees and attendance.
 
 ---
 
 ## Tech stack
 
-| Layer        | Choice              |
-|-------------|---------------------|
-| Framework   | Flutter             |
-| State       | Riverpod            |
-| Backend     | Firebase (Auth + Firestore) |
-| Icons       | Solar Icons         |
-| Fonts       | Google Fonts (Poppins) |
+| Layer     | Choice                          |
+|----------|----------------------------------|
+| Framework| Flutter                          |
+| State    | Riverpod                         |
+| Backend  | Firebase (Auth + Firestore)      |
+| Location | Geolocator (geofencing)         |
+| Icons    | Solar Icons                      |
+| Fonts    | Google Fonts (Poppins)           |
 
-The app follows a **feature-based** structure with **data / domain / presentation** layers per feature.
+Feature-based structure: **data** / **domain** / **presentation** per feature.
 
 ---
 
@@ -53,56 +56,45 @@ cd tymio
 flutter pub get
 ```
 
-### 2. Firebase (local config — not committed)
+### 2. Firebase config (local, not committed)
 
-Secrets and Firebase config are **not** in the repo. Set them up locally:
+1. Copy the template:  
+   `cp lib/firebase_options.example.dart lib/firebase_options.dart`
+2. Generate your config:  
+   `flutterfire configure`  
+   This overwrites `lib/firebase_options.dart`. Do not commit it (it’s in `.gitignore`).
 
-1. **Copy the Firebase options template**  
-   From the project root:
-   ```bash
-   cp lib/firebase_options.example.dart lib/firebase_options.dart
-   ```
-2. **Generate your config**  
-   Log in to Firebase and link the app:
-   ```bash
-   flutterfire configure
-   ```
-   This overwrites `lib/firebase_options.dart` with your project’s config. **Do not commit this file** (it’s in `.gitignore`).
+### 3. Firebase Console
 
-### 3. Firebase Console setup
+In your [Firebase project](https://console.firebase.google.com):
 
-In [Firebase Console](https://console.firebase.google.com) for your project:
+1. **Authentication** → Sign-in method → enable **Email/Password**
+2. **Firestore** → Create database (e.g. test mode first, then lock down with rules)
+3. **Firestore → Rules** — example (adjust as needed):
 
-1. **Authentication** → Sign-in method → enable **Email/Password**.
-2. **Firestore Database** → Create database (e.g. start in test mode, then tighten rules).
-3. **Firestore → Rules** — use rules that:
-   - Let users read/write their own `users` doc and let employers read `users` docs where `employerId == request.auth.uid`.
-   - Let authenticated users read/write `attendance` (restrict further if needed).
-   - **Geofencing**: Employers can set office location in `companies/{employerId}` doc.
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null
+        && (request.auth.uid == userId || resource.data.employerId == request.auth.uid);
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    match /attendance/{docId} {
+      allow read, write: if request.auth != null;
+    }
+    match /companies/{employerId} {
+      allow read, write: if request.auth != null && request.auth.uid == employerId;
+    }
+  }
+}
+```
 
-   Example:
+4. **Indexes** — create any composite indexes Firestore suggests (e.g. `attendance`: `userId` + `date`)
 
-   ```javascript
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /users/{userId} {
-         allow read: if request.auth != null
-           && (request.auth.uid == userId || resource.data.employerId == request.auth.uid);
-         allow create: if request.auth != null && request.auth.uid == userId;
-         allow update, delete: if request.auth != null && request.auth.uid == userId;
-       }
-       match /attendance/{docId} {
-         allow read, write: if request.auth != null;
-       }
-     }
-   }
-   ```
-
-4. **Indexes**  
-   If Firestore prompts for composite indexes (e.g. for `attendance` queries by `userId` and `date`), create them via the link in the error message or in Firestore → Indexes.
-
-### 4. Run the app
+### 4. Run
 
 ```bash
 flutter run
@@ -114,46 +106,62 @@ flutter run
 
 ```
 lib/
-├── main.dart                 # App entry, Firebase init, auth routing
-├── firebase_options.example.dart   # Template (copy → firebase_options.dart)
-├── core/                     # Shared UI, theme, utils
-│   ├── constants/
-│   ├── theme/
-│   ├── utils/
-│   └── widgets/
+├── main.dart
+├── firebase_options.example.dart
+├── core/
+│   ├── constants/     # app_colors
+│   ├── theme/         # app_theme (light/dark)
+│   ├── utils/         # validators
+│   └── widgets/       # custom_button, custom_text_field
 └── features/
-    ├── auth/                 # Login, register, user roles
-    │   ├── data/
-    │   ├── domain/
-    │   └── presentation/
-    └── attendance/           # Check-in/out, history, employer analytics
-        ├── data/
-        ├── domain/
+    ├── auth/          # login, register, user/role, employer code
+    │   ├── data/      # auth_repository_impl, user_model
+    │   ├── domain/    # app_user, auth_repository_interface
+    │   └── presentation/  # auth_provider, login_screen, register_screen
+    └── attendance/
+        ├── data/      # attendance_repository_impl, attendance_model
+        ├── domain/    # attendance, attendance_repository_interface
         └── presentation/
+            ├── providers/  # attendance_provider
+            └── screens/    # employee_dashboard, employee_history_screen,
+                            # employer_dashboard, employer_settings_screen,
+                            # employee_detail_screen
 ```
 
-- **data**: repositories, models (Firebase).
-- **domain**: entities, repository interfaces.
-- **presentation**: Riverpod providers, screens, widgets.
+---
+
+## Firestore data
+
+| Collection   | Purpose |
+|-------------|---------|
+| `users`    | User profile: name, email, role (`employee` / `employer`), `employerId` (for employees) |
+| `attendance` | One doc per check-in: `userId`, `checkIn`, `checkOut`, `date`, optional `checkInLat`/`checkInLng`, `checkOutLat`/`checkOutLng` |
+| `companies` | Per employer (`doc id = employerId`): `officeLat`, `officeLng`, `officeRadiusMeters` for geofencing |
+
+---
+
+## Location / geofencing
+
+- **Android**: `AndroidManifest.xml` includes `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION`
+- **iOS**: `Info.plist` includes location usage descriptions
+- Employer sets office in **Settings** (or “Office location for check-in” on dashboard). Employees must be within the set radius to check in when geofencing is configured; if location is unavailable or not set, check-in still works without location.
 
 ---
 
 ## Building for release
 
-- **Android**  
-  `flutter build apk` or `flutter build appbundle`
-- **iOS**  
-  `flutter build ios` then open `ios/Runner.xcworkspace` in Xcode for signing and archive.
+- **Android**: `flutter build apk` or `flutter build appbundle`
+- **iOS**: `flutter build ios`, then open `ios/Runner.xcworkspace` in Xcode for signing and archive
 
 ---
 
-## Ignored files (secrets / local config)
+## Ignored files
 
-These are listed in `.gitignore` and should not be committed:
+In `.gitignore` (do not commit):
 
-- `lib/firebase_options.dart` — your Firebase config (use the example template and `flutterfire configure`).
-- `.env`, `.env.*` — any environment or API keys.
-- `google-services.json`, `GoogleService-Info.plist` — use your own Firebase project files locally.
+- `lib/firebase_options.dart`
+- `.env`, `.env.*`
+- `google-services.json`, `GoogleService-Info.plist`
 
 ---
 
@@ -165,4 +173,4 @@ This project is open source. See the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
-Contributions are welcome. Please open an issue or a pull request. Ensure the app runs after `flutter pub get`, copying `firebase_options.example.dart` to `firebase_options.dart`, and configuring your own Firebase project.
+Contributions are welcome. Open an issue or a pull request. To run locally: `flutter pub get`, copy `firebase_options.example.dart` to `firebase_options.dart`, run `flutterfire configure`, and use your own Firebase project.
